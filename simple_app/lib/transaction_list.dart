@@ -42,7 +42,7 @@ class TransactionList extends StatelessWidget {
                   child: Text('Date : ' + DateFormat.yMMMd().format(tx.date),
                       style: TextStyle(color: Colors.black54))),
             ],
-          )
+          ),
         ]),
         elevation: 10,
         color: Color(tx.color),
