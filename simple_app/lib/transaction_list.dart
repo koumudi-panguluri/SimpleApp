@@ -4,7 +4,8 @@ import './models/transcation.dart';
 
 class TransactionList extends StatelessWidget {
   final List<Transaction> transactionsList;
-  TransactionList(this.transactionsList);
+  final Function deleteTx;
+  TransactionList(this.transactionsList, this.deleteTx);
 
   @override
   Widget build(BuildContext context) {
@@ -14,15 +15,27 @@ class TransactionList extends StatelessWidget {
         child: Row(children: [
           Container(
             margin: EdgeInsets.symmetric(horizontal: 15, vertical: 20),
-            decoration: BoxDecoration(
-                border:
-                    Border.all(color: Colors.white, style: BorderStyle.solid)),
-            child: Text(
-              tx.price.toStringAsFixed(2) + tx.currency,
-              style: TextStyle(
-                  fontStyle: FontStyle.italic, fontWeight: FontWeight.bold),
+            // decoration: BoxDecoration(
+            //     color: Colors.white60,
+            //     border:
+            //         Border.all(color: Colors.white, style: BorderStyle.solid),
+            //     borderRadius: BorderRadius.circular(50)),
+            child: CircleAvatar(
+              radius: 30,
+              backgroundColor: Colors.white60,
+              foregroundColor: Colors.black,
+              child: Container(
+                padding: EdgeInsets.all(6),
+                child: FittedBox(
+                  child: Text(
+                    '${tx.currency} ${tx.price.toStringAsFixed(2)}',
+                    style: TextStyle(
+                        fontStyle: FontStyle.italic,
+                        fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ),
             ),
-            padding: EdgeInsets.all(15),
           ),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -43,6 +56,17 @@ class TransactionList extends StatelessWidget {
                       style: TextStyle(color: Colors.black54))),
             ],
           ),
+          Container(
+            child: Expanded(
+              child: IconButton(
+                icon: Icon(Icons.delete),
+                onPressed: () {
+                  deleteTx(tx);
+                },
+                color: Colors.black87,
+              ),
+            ),
+          )
         ]),
         elevation: 10,
         color: Color(tx.color),

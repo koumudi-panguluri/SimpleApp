@@ -51,13 +51,13 @@ class _MyHomeAppState extends State<MyHomeApp> {
     //     color: 0xff9FA8DA)
   ];
 
-  void _addNewTransaction(String name, double amount) {
+  void _addNewTransaction(String name, double amount, DateTime date) {
     final newTx = Transaction(
         title: name,
         id: 3,
         price: amount,
         currency: '\$',
-        date: DateTime.now(),
+        date: date,
         color: colors[colorCount]);
     setState(() {
       _transactions.add(newTx);
@@ -65,6 +65,12 @@ class _MyHomeAppState extends State<MyHomeApp> {
       if (colorCount > 4) {
         colorCount = 0;
       }
+    });
+  }
+
+  void _deleteTransaction(deleteTxId) {
+    setState(() {
+      _transactions.remove(deleteTxId);
     });
   }
 
@@ -126,7 +132,7 @@ class _MyHomeAppState extends State<MyHomeApp> {
                     //   ),
                     // ),
                     //
-                    TransactionList(_transactions),
+                    TransactionList(_transactions, _deleteTransaction),
                   ]),
             ),
       floatingActionButton: FloatingActionButton(
