@@ -6,6 +6,39 @@ class TransactionList extends StatelessWidget {
   final List<Transaction> transactionsList;
   final Function deleteTx;
   TransactionList(this.transactionsList, this.deleteTx);
+  void dialogBox(context, deleteTransaction) {
+    showDialog(
+        context: context,
+        child: new AlertDialog(
+            title: new Text(
+              'Do you want to Delete?',
+              style: TextStyle(fontStyle: FontStyle.italic),
+            ),
+            content: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Container(
+                    child: FlatButton(
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                        child: Text(
+                          'Cancel',
+                          style: TextStyle(color: Colors.green),
+                        ))),
+                Container(
+                    child: FlatButton(
+                        onPressed: () {
+                          deleteTx(deleteTransaction);
+                          Navigator.of(context).pop();
+                        },
+                        child: Text(
+                          'Delete',
+                          style: TextStyle(color: Colors.red),
+                        ))),
+              ],
+            )));
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -56,13 +89,24 @@ class TransactionList extends StatelessWidget {
                       style: TextStyle(color: Colors.black54))),
             ],
           ),
+          SizedBox(width: 50),
           Container(
             child: Expanded(
               child: IconButton(
                 icon: Icon(Icons.delete),
                 onPressed: () {
-                  deleteTx(tx);
+                  dialogBox(context, tx);
+                  // deleteTx(tx);
                 },
+                color: Colors.black87,
+              ),
+            ),
+          ),
+          Container(
+            child: Expanded(
+              child: IconButton(
+                icon: Icon(Icons.edit),
+                onPressed: () {},
                 color: Colors.black87,
               ),
             ),
