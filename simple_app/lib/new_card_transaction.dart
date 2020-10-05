@@ -27,7 +27,6 @@ class _NewTransactionState extends State<NewTransaction> {
     if (widget.transactionData != null) {
       print('title: ${widget.transactionData.title}');
     }
-
     Navigator.of(context).pop();
   }
 

@@ -1,8 +1,11 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:simple_app/new_card_transaction.dart';
 import './models/transcation.dart';
 import './transaction_list.dart';
 import './chart.dart';
+import 'package:http/http.dart' as http;
 
 void main() {
   runApp(MyApp());
@@ -34,6 +37,7 @@ class _MyHomeAppState extends State<MyHomeApp> {
     0xffD96BBB,
   ];
   int colorCount = 0;
+  var url = "https://flutter-63d7e.firebaseio.com/expense.json";
   final List<Transaction> _transactions = [
     // Transaction(
     //     title: 'First Expense',
@@ -51,28 +55,42 @@ class _MyHomeAppState extends State<MyHomeApp> {
     //     color: 0xff9FA8DA)
   ];
 
-  void _addNewTransaction(
+  Future<void> _addNewTransaction(
       String name, double amount, DateTime date, int index) {
-    final newTx = Transaction(
-        title: name,
-        id: DateTime.now().toString(),
-        price: amount,
-        currency: '\$',
-        date: date,
-        color: colors[colorCount]);
-    setState(() {
-      // index = _transactions.indexOf(newTx);
-      print("index $index length ${_transactions.length}");
-      if (index == null || index < 0) {
-        _transactions.add(newTx);
-      } else {
-        _transactions.insert(index, newTx);
-        _transactions.removeAt(index + 1);
-      }
-      colorCount++;
-      if (colorCount > 4) {
-        colorCount = 0;
-      }
+    var newTx;
+    return http
+        .post(url,
+            body: json.encode({
+              'title': name,
+              'price': amount,
+              'date': date.toString(),
+            }))
+        .then((value) {
+      print('decode: ${json.decode(value.body)}');
+      newTx = Transaction(
+          title: name,
+          id: json.decode(value.body)['name'],
+          price: amount,
+          currency: '\$',
+          date: date,
+          color: colors[colorCount]);
+      setState(() {
+        // index = _transactions.indexOf(newTx);
+        print("index $index length ${_transactions.length}");
+        if (index == null || index < 0) {
+          _transactions.add(newTx);
+        } else {
+          _transactions.insert(index, newTx);
+          _transactions.removeAt(index + 1);
+        }
+        colorCount++;
+        if (colorCount > 4) {
+          colorCount = 0;
+        }
+      });
+    }).catchError((error) {
+      print("error occured");
+      return error;
     });
   }
 
@@ -100,6 +118,15 @@ class _MyHomeAppState extends State<MyHomeApp> {
     return _transactions.where((tx) {
       return tx.date.isAfter(date);
     }).toList();
+  }
+
+  @override
+  void initState() {
+    print("hello");
+    http.get(url).then((value) {
+      print("value ${json.decode(value.body)}");
+    });
+    super.initState();
   }
 
   Widget build(BuildContext context) {
