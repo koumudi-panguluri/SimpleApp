@@ -1,23 +1,33 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
+import './models/transcation.dart';
+
 class NewTransaction extends StatefulWidget {
   final Function _addTransaction;
-  NewTransaction(this._addTransaction);
+  final Transaction transactionData;
+  final int index;
+  NewTransaction(this._addTransaction, this.transactionData, this.index);
   _NewTransactionState createState() => _NewTransactionState();
 }
 
 class _NewTransactionState extends State<NewTransaction> {
-  final titleController = TextEditingController();
-  final amountController = TextEditingController();
+  var titleController = TextEditingController();
+  var amountController = TextEditingController();
   DateTime dateChoosed;
+
   void _submitFields() {
     final String textField = titleController.text;
     final double amountField = double.parse(amountController.text);
     if (textField.isEmpty || amountField <= 0 || dateChoosed == null) {
       return;
     }
-    widget._addTransaction(textField, amountField, dateChoosed);
+    print("index ${widget.index}");
+    widget._addTransaction(textField, amountField, dateChoosed, widget.index);
+    if (widget.transactionData != null) {
+      print('title: ${widget.transactionData.title}');
+    }
+
     Navigator.of(context).pop();
   }
 
@@ -35,6 +45,20 @@ class _NewTransactionState extends State<NewTransaction> {
         dateChoosed = date;
       });
     });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.transactionData != null) {
+      titleController =
+          TextEditingController(text: widget.transactionData.title);
+      amountController =
+          TextEditingController(text: widget.transactionData.price.toString());
+    } else {
+      titleController = TextEditingController();
+      amountController = TextEditingController();
+    }
   }
 
   @override

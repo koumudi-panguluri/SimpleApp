@@ -1,6 +1,6 @@
 class Transaction {
   final String title;
-  final int id;
+  final String id;
   final double price;
   final String currency;
   final DateTime date;

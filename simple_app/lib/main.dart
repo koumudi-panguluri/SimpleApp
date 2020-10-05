@@ -51,16 +51,24 @@ class _MyHomeAppState extends State<MyHomeApp> {
     //     color: 0xff9FA8DA)
   ];
 
-  void _addNewTransaction(String name, double amount, DateTime date) {
+  void _addNewTransaction(
+      String name, double amount, DateTime date, int index) {
     final newTx = Transaction(
         title: name,
-        id: 3,
+        id: DateTime.now().toString(),
         price: amount,
         currency: '\$',
         date: date,
         color: colors[colorCount]);
     setState(() {
-      _transactions.add(newTx);
+      // index = _transactions.indexOf(newTx);
+      print("index $index length ${_transactions.length}");
+      if (index == null || index < 0) {
+        _transactions.add(newTx);
+      } else {
+        _transactions.insert(index, newTx);
+        _transactions.removeAt(index + 1);
+      }
       colorCount++;
       if (colorCount > 4) {
         colorCount = 0;
@@ -74,14 +82,14 @@ class _MyHomeAppState extends State<MyHomeApp> {
     });
   }
 
-  void onAddCard(BuildContext ctx) {
+  void onAddCard({BuildContext ctx, transactionData, index}) {
     showModalBottomSheet(
         context: ctx,
         builder: (builderCtx) {
           return GestureDetector(
             onTap: () {},
             behavior: HitTestBehavior.opaque,
-            child: NewTransaction(_addNewTransaction),
+            child: NewTransaction(_addNewTransaction, transactionData, index),
           );
         });
   }
@@ -99,7 +107,8 @@ class _MyHomeAppState extends State<MyHomeApp> {
       appBar: AppBar(
         title: Text('Koumi App'),
         actions: <Widget>[
-          IconButton(icon: Icon(Icons.add), onPressed: () => onAddCard(context))
+          IconButton(
+              icon: Icon(Icons.add), onPressed: () => onAddCard(ctx: context))
         ],
       ),
       body: _transactions.isEmpty
@@ -132,12 +141,13 @@ class _MyHomeAppState extends State<MyHomeApp> {
                     //   ),
                     // ),
                     //
-                    TransactionList(_transactions, _deleteTransaction),
+                    TransactionList(
+                        _transactions, _deleteTransaction, onAddCard),
                   ]),
             ),
       floatingActionButton: FloatingActionButton(
         child: Icon(Icons.add),
-        onPressed: () => onAddCard(context),
+        onPressed: () => onAddCard(ctx: context),
         backgroundColor: Colors.deepOrangeAccent[200],
       ),
     );

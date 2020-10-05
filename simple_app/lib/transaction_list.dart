@@ -5,7 +5,8 @@ import './models/transcation.dart';
 class TransactionList extends StatelessWidget {
   final List<Transaction> transactionsList;
   final Function deleteTx;
-  TransactionList(this.transactionsList, this.deleteTx);
+  final Function bottomCard;
+  TransactionList(this.transactionsList, this.deleteTx, this.bottomCard);
   void dialogBox(context, deleteTransaction) {
     showDialog(
         context: context,
@@ -106,7 +107,12 @@ class TransactionList extends StatelessWidget {
             child: Expanded(
               child: IconButton(
                 icon: Icon(Icons.edit),
-                onPressed: () {},
+                onPressed: () {
+                  bottomCard(
+                      ctx: context,
+                      transactionData: tx,
+                      index: transactionsList.indexOf(tx));
+                },
                 color: Colors.black87,
               ),
             ),
