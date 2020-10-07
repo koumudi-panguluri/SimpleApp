@@ -4,7 +4,7 @@ import 'package:intl/intl.dart';
 import './models/transcation.dart';
 
 class NewTransaction extends StatefulWidget {
-  final Function _addTransaction;
+  final _addTransaction;
   final Transaction transactionData;
   final int index;
   NewTransaction(this._addTransaction, this.transactionData, this.index);
@@ -15,7 +15,7 @@ class _NewTransactionState extends State<NewTransaction> {
   var titleController = TextEditingController();
   var amountController = TextEditingController();
   DateTime dateChoosed;
-
+  var isLoading = false;
   void _submitFields() {
     final String textField = titleController.text;
     final double amountField = double.parse(amountController.text);
@@ -23,11 +23,38 @@ class _NewTransactionState extends State<NewTransaction> {
       return;
     }
     print("index ${widget.index}");
-    widget._addTransaction(textField, amountField, dateChoosed, widget.index);
-    if (widget.transactionData != null) {
-      print('title: ${widget.transactionData.title}');
-    }
-    Navigator.of(context).pop();
+    setState(() {
+      this.isLoading = true;
+    });
+    widget
+        ._addTransaction(textField, amountField, dateChoosed, widget.index)
+        .catchError((error) {
+      showDialog(
+          context: context,
+          child: new AlertDialog(
+            title: Text("Something went Wrong"),
+            actions: <Widget>[
+              Container(
+                child: FlatButton(
+                    onPressed: Navigator.of(context).pop,
+                    child: Text(
+                      "Cancel",
+                      style: TextStyle(color: Colors.red),
+                    )),
+              )
+            ],
+          ));
+    }).then((_) {
+      setState(() {
+        this.isLoading = false;
+      });
+      print("popped");
+      Navigator.of(context).pop();
+    });
+
+    // if (widget.transactionData != null) {
+    //   print('title: ${widget.transactionData.title}');
+    // }
   }
 
   void _selectedDate() {
@@ -62,71 +89,75 @@ class _NewTransactionState extends State<NewTransaction> {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-        color: Colors.blueGrey[50],
-        elevation: 15,
-        child: Column(crossAxisAlignment: CrossAxisAlignment.center, children: [
-          Container(
-              padding: EdgeInsets.all(15),
-              child: Text(
-                'Enter the Expenses',
-                style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black54),
-                textAlign: TextAlign.center,
-              )),
-          Container(
-            padding: EdgeInsets.all(15),
-            child: TextField(
-              decoration: InputDecoration(labelText: 'Title'),
-              controller: titleController,
-              onSubmitted: (_) => _submitFields(),
-            ),
-          ),
-          Container(
-            padding: EdgeInsets.all(15),
-            child: TextField(
-              decoration: InputDecoration(labelText: 'Amount'),
-              controller: amountController,
-              keyboardType: TextInputType.number,
-              onSubmitted: (_) => _submitFields(),
-            ),
-          ),
-          Container(
-            padding: EdgeInsets.all(15),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  dateChoosed == null
-                      ? 'No Date Choosen!'
-                      : DateFormat.yMMMd().format(dateChoosed),
-                  style: TextStyle(color: Colors.black54),
-                ),
-                FlatButton(
-                    // padding: EdgeInsets.symmetric(horizontal: 15, vertical: 0),
-                    child: Text(
-                      'Choose Date',
-                      style: TextStyle(color: Colors.blue),
+    return isLoading == true
+        ? Center(child: CircularProgressIndicator())
+        : Card(
+            color: Colors.blueGrey[50],
+            elevation: 15,
+            child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Container(
+                      padding: EdgeInsets.all(15),
+                      child: Text(
+                        'Enter the Expenses',
+                        style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black54),
+                        textAlign: TextAlign.center,
+                      )),
+                  Container(
+                    padding: EdgeInsets.all(15),
+                    child: TextField(
+                      decoration: InputDecoration(labelText: 'Title'),
+                      controller: titleController,
+                      onSubmitted: (_) => _submitFields(),
                     ),
-                    onPressed: _selectedDate)
-              ],
-            ),
-          ),
-          Container(
-              padding: EdgeInsets.all(10),
-              child: RaisedButton(
-                  color: Colors.blue[100],
-                  child: Text(
-                    'Add Transaction',
-                    style: TextStyle(color: Colors.blueAccent),
                   ),
-                  onPressed: () {
-                    _submitFields();
-                    print(titleController.text);
-                    print(amountController.text);
-                  })),
-        ]));
+                  Container(
+                    padding: EdgeInsets.all(15),
+                    child: TextField(
+                      decoration: InputDecoration(labelText: 'Amount'),
+                      controller: amountController,
+                      keyboardType: TextInputType.number,
+                      onSubmitted: (_) => _submitFields(),
+                    ),
+                  ),
+                  Container(
+                    padding: EdgeInsets.all(15),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          dateChoosed == null
+                              ? 'No Date Choosen!'
+                              : DateFormat.yMMMd().format(dateChoosed),
+                          style: TextStyle(color: Colors.black54),
+                        ),
+                        FlatButton(
+                            // padding: EdgeInsets.symmetric(horizontal: 15, vertical: 0),
+                            child: Text(
+                              'Choose Date',
+                              style: TextStyle(color: Colors.blue),
+                            ),
+                            onPressed: _selectedDate)
+                      ],
+                    ),
+                  ),
+                  Container(
+                      padding: EdgeInsets.all(10),
+                      child: RaisedButton(
+                          color: Colors.blue[100],
+                          child: Text(
+                            'Add Transaction',
+                            style: TextStyle(color: Colors.blueAccent),
+                          ),
+                          onPressed: () {
+                            _submitFields();
+                            print(titleController.text);
+                            print(amountController.text);
+                          })),
+                ]));
   }
 }

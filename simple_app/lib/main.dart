@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:simple_app/new_card_transaction.dart';
 import './models/transcation.dart';
 import './transaction_list.dart';
@@ -38,22 +39,34 @@ class _MyHomeAppState extends State<MyHomeApp> {
   ];
   int colorCount = 0;
   var url = "https://flutter-63d7e.firebaseio.com/expense.json";
-  final List<Transaction> _transactions = [
-    // Transaction(
-    //     title: 'First Expense',
-    //     id: 1,
-    //     price: 10,
-    //     currency: '\$',
-    //     date: DateTime.now(),
-    //     color: 0xff81D4FA),
-    // Transaction(
-    //     title: 'Second Expense',
-    //     id: 2,
-    //     price: 20,
-    //     currency: '\$',
-    //     date: DateTime.now(),
-    //     color: 0xff9FA8DA)
-  ];
+  List<Transaction> _transactions = [];
+  Future<void> getData() {
+    return http.get(url).then((value) {
+      print("value ${json.decode(value.body)}");
+      final data = json.decode(value.body) as Map<String, dynamic>;
+      final List<Transaction> _getTransaction = [];
+      data.forEach((key, value) {
+        _getTransaction.add(Transaction(
+            title: value['title'],
+            id: key,
+            price: value['price'],
+            date: DateTime.parse(value['date']),
+            currency: '\$',
+            color: colors[colorCount]));
+        colorCount++;
+        if (colorCount > 4) {
+          colorCount = 0;
+        }
+      });
+
+      setState(() {
+        _transactions = _getTransaction;
+      });
+    }).catchError((error) {
+      print("error occured $error");
+      throw error;
+    });
+  }
 
   Future<void> _addNewTransaction(
       String name, double amount, DateTime date, int index) {
@@ -90,7 +103,7 @@ class _MyHomeAppState extends State<MyHomeApp> {
       });
     }).catchError((error) {
       print("error occured");
-      return error;
+      throw error;
     });
   }
 
@@ -122,11 +135,25 @@ class _MyHomeAppState extends State<MyHomeApp> {
 
   @override
   void initState() {
-    print("hello");
-    http.get(url).then((value) {
-      print("value ${json.decode(value.body)}");
-    });
     super.initState();
+    print("Hello, Welcome to Koumi's App");
+    getData().catchError((error) {
+      showDialog(
+          context: context,
+          child: new AlertDialog(
+            title: Text("Something went Wrong"),
+            actions: <Widget>[
+              Container(
+                child: FlatButton(
+                    onPressed: Navigator.of(context).pop,
+                    child: Text(
+                      "Cancel",
+                      style: TextStyle(color: Colors.red),
+                    )),
+              )
+            ],
+          ));
+    });
   }
 
   Widget build(BuildContext context) {
