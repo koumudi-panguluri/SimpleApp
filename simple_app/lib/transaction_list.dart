@@ -108,10 +108,7 @@ class TransactionList extends StatelessWidget {
               child: IconButton(
                 icon: Icon(Icons.edit),
                 onPressed: () {
-                  bottomCard(
-                      ctx: context,
-                      transactionData: tx,
-                      index: transactionsList.indexOf(tx));
+                  bottomCard(ctx: context, transactionData: tx, id: tx.id);
                 },
                 color: Colors.black87,
               ),

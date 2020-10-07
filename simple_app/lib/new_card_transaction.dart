@@ -6,8 +6,8 @@ import './models/transcation.dart';
 class NewTransaction extends StatefulWidget {
   final _addTransaction;
   final Transaction transactionData;
-  final int index;
-  NewTransaction(this._addTransaction, this.transactionData, this.index);
+  final String id;
+  NewTransaction(this._addTransaction, this.transactionData, this.id);
   _NewTransactionState createState() => _NewTransactionState();
 }
 
@@ -22,12 +22,12 @@ class _NewTransactionState extends State<NewTransaction> {
     if (textField.isEmpty || amountField <= 0 || dateChoosed == null) {
       return;
     }
-    print("index ${widget.index}");
+    print("index ${widget.id}");
     setState(() {
       this.isLoading = true;
     });
     widget
-        ._addTransaction(textField, amountField, dateChoosed, widget.index)
+        ._addTransaction(textField, amountField, dateChoosed, widget.id)
         .catchError((error) {
       showDialog(
           context: context,

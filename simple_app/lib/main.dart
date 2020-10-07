@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:simple_app/new_card_transaction.dart';
 import './models/transcation.dart';
 import './transaction_list.dart';
@@ -69,7 +68,7 @@ class _MyHomeAppState extends State<MyHomeApp> {
   }
 
   Future<void> _addNewTransaction(
-      String name, double amount, DateTime date, int index) {
+      String name, double amount, DateTime date, String id) {
     var newTx;
     return http
         .post(url,
@@ -88,13 +87,12 @@ class _MyHomeAppState extends State<MyHomeApp> {
           date: date,
           color: colors[colorCount]);
       setState(() {
-        // index = _transactions.indexOf(newTx);
-        print("index $index length ${_transactions.length}");
-        if (index == null || index < 0) {
+        print("id $id length ${_transactions.length}");
+        if (id == null) {
           _transactions.add(newTx);
         } else {
-          _transactions.insert(index, newTx);
-          _transactions.removeAt(index + 1);
+          // _transactions.insert(id, newTx);
+          // _transactions.removeAt(id + 1);
         }
         colorCount++;
         if (colorCount > 4) {
@@ -113,14 +111,14 @@ class _MyHomeAppState extends State<MyHomeApp> {
     });
   }
 
-  void onAddCard({BuildContext ctx, transactionData, index}) {
+  void onAddCard({BuildContext ctx, transactionData, id}) {
     showModalBottomSheet(
         context: ctx,
         builder: (builderCtx) {
           return GestureDetector(
             onTap: () {},
             behavior: HitTestBehavior.opaque,
-            child: NewTransaction(_addNewTransaction, transactionData, index),
+            child: NewTransaction(_addNewTransaction, transactionData, id),
           );
         });
   }
