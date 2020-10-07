@@ -1,7 +1,8 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:simple_app/new_card_transaction.dart';
+import './models/http_exceptions.dart';
+import './new_card_transaction.dart';
 import './models/transcation.dart';
 import './transaction_list.dart';
 import './chart.dart';
@@ -133,23 +134,23 @@ class _MyHomeAppState extends State<MyHomeApp> {
     }
   }
 
-  Future<void> _deleteTransaction(deleteTxId) {
+  void _deleteTransaction(deleteTxId) async {
     String id = deleteTxId.id;
     final deleteUrl = "https://flutter-63d7e.firebaseio.com/expense/$id.json";
     final index = _transactions.indexWhere((tx) => tx.id == id);
-    return http.delete(deleteUrl).then((response) {
-      print("show delete response ${response.statusCode}");
-      if (response.statusCode >= 400) {
-        print("error occured");
-        setState(() {
-          _transactions.insert(index, deleteTxId);
-        });
-      } else {
-        setState(() {
-          _transactions.remove(deleteTxId);
-        });
-      }
-    });
+    final response = await http.delete(deleteUrl);
+    print("show delete response ${response.statusCode}");
+    if (response.statusCode >= 400) {
+      print("error occured");
+      setState(() {
+        _transactions.insert(index, deleteTxId);
+      });
+      throw HttpException('Deletion failed!');
+    } else {
+      setState(() {
+        _transactions.remove(deleteTxId);
+      });
+    }
   }
 
   void onAddCard({BuildContext ctx, transactionData, id}) {

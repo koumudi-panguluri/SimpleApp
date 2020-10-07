@@ -29,9 +29,16 @@ class TransactionList extends StatelessWidget {
                         ))),
                 Container(
                     child: FlatButton(
-                        onPressed: () {
-                          deleteTx(deleteTransaction);
-                          Navigator.of(context).pop();
+                        onPressed: () async {
+                          try {
+                            await deleteTx(deleteTransaction);
+                            Navigator.of(context).pop();
+                          } catch (error) {
+                            Scaffold.of(context).showSnackBar(SnackBar(
+                              content: Text("Deletion failed!"),
+                              duration: Duration(seconds: 5),
+                            ));
+                          }
                         },
                         child: Text(
                           'Delete',
