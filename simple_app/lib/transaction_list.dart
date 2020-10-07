@@ -97,7 +97,6 @@ class TransactionList extends StatelessWidget {
                 icon: Icon(Icons.delete),
                 onPressed: () {
                   dialogBox(context, tx);
-                  // deleteTx(tx);
                 },
                 color: Colors.black87,
               ),

@@ -39,6 +39,7 @@ class _MyHomeAppState extends State<MyHomeApp> {
   int colorCount = 0;
   var url = "https://flutter-63d7e.firebaseio.com/expense.json";
   List<Transaction> _transactions = [];
+
   Future<void> getData() {
     return http.get(url).then((value) {
       print("value ${json.decode(value.body)}");
@@ -70,44 +71,84 @@ class _MyHomeAppState extends State<MyHomeApp> {
   Future<void> _addNewTransaction(
       String name, double amount, DateTime date, String id) {
     var newTx;
-    return http
-        .post(url,
-            body: json.encode({
-              'title': name,
-              'price': amount,
-              'date': date.toString(),
-            }))
-        .then((value) {
-      print('decode: ${json.decode(value.body)}');
-      newTx = Transaction(
-          title: name,
-          id: json.decode(value.body)['name'],
-          price: amount,
-          currency: '\$',
-          date: date,
-          color: colors[colorCount]);
-      setState(() {
-        print("id $id length ${_transactions.length}");
-        if (id == null) {
+    final index = _transactions.indexWhere((tx) => tx.id == id);
+    if (id == null) {
+      return http
+          .post(url,
+              body: json.encode({
+                'title': name,
+                'price': amount,
+                'date': date.toString(),
+              }))
+          .then((value) {
+        print('decode: ${json.decode(value.body)}');
+        newTx = Transaction(
+            title: name,
+            id: json.decode(value.body)['name'],
+            price: amount,
+            currency: '\$',
+            date: date,
+            color: colors[colorCount]);
+        setState(() {
+          print("id $id length ${_transactions.length}");
           _transactions.add(newTx);
-        } else {
-          // _transactions.insert(id, newTx);
-          // _transactions.removeAt(id + 1);
-        }
-        colorCount++;
-        if (colorCount > 4) {
-          colorCount = 0;
-        }
+          colorCount++;
+          if (colorCount > 4) {
+            colorCount = 0;
+          }
+        });
+      }).catchError((error) {
+        print("error occured");
+        throw error;
       });
-    }).catchError((error) {
-      print("error occured");
-      throw error;
-    });
+    } else {
+      var patchUrl = "https://flutter-63d7e.firebaseio.com/expense/$id.json";
+      return http
+          .patch(patchUrl,
+              body: json.encode({
+                'title': name,
+                'price': amount,
+                'date': date.toString(),
+              }))
+          .then((value) {
+        print("after edit ${json.decode(value.body)}");
+        final newTx = Transaction(
+            title: name,
+            id: json.decode(value.body)['name'],
+            price: amount,
+            currency: '\$',
+            date: date,
+            color: colors[colorCount]);
+        setState(() {
+          _transactions[index] = newTx;
+          colorCount++;
+          if (colorCount > 4) {
+            colorCount = 0;
+          }
+        });
+      }).catchError((error) {
+        print("error occured");
+        throw error;
+      });
+    }
   }
 
-  void _deleteTransaction(deleteTxId) {
-    setState(() {
-      _transactions.remove(deleteTxId);
+  Future<void> _deleteTransaction(deleteTxId) {
+    String id = deleteTxId.id;
+    final deleteUrl = "https://flutter-63d7e.firebaseio.com/expense/$id.json";
+    final index = _transactions.indexWhere((tx) => tx.id == id);
+    return http.delete(deleteUrl).then((response) {
+      print("show delete response ${response.statusCode}");
+      if (response.statusCode >= 400) {
+        print("error occured");
+        setState(() {
+          _transactions.insert(index, deleteTxId);
+        });
+      } else {
+        setState(() {
+          _transactions.remove(deleteTxId);
+        });
+      }
     });
   }
 
