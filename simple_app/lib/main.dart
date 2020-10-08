@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import './models/http_exceptions.dart';
 import './new_card_transaction.dart';
@@ -177,6 +178,19 @@ class _MyHomeAppState extends State<MyHomeApp> {
   void initState() {
     super.initState();
     print("Hello, Welcome to Koumi's App");
+    //firebase messaging
+    final fbm = FirebaseMessaging();
+    fbm.requestNotificationPermissions();
+    fbm.configure(onMessage: (message) {
+      print("on message $message");
+      return;
+    }, onLaunch: (message) {
+      print("on launch $message");
+      return;
+    }, onResume: (message) {
+      print("on resume $message");
+      return;
+    });
     getData().catchError((error) {
       showDialog(
           context: context,
