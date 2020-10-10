@@ -174,6 +174,44 @@ class _MyHomeAppState extends State<MyHomeApp> {
     }).toList();
   }
 
+  @override
+  void initState() {
+    super.initState();
+    print(
+        "Hello, Welcome to My App. This is my First App in Dart. (By Koumudi)");
+    //firebase messaging changes
+    final firebase = FirebaseMessaging();
+    firebase.requestNotificationPermissions();
+    firebase.configure(onMessage: (message) {
+      print("message in on message $message");
+      return;
+    }, onLaunch: (message) {
+      print("message in on launch $message");
+      return;
+    }, onResume: (message) {
+      print("message in on resume $message");
+      return;
+    });
+    // if no network or some error
+    getData().catchError((error) {
+      showDialog(
+          context: context,
+          child: new AlertDialog(
+            title: Text("Something went Wrong. Please Try again Later..!"),
+            actions: <Widget>[
+              Container(
+                child: FlatButton(
+                    onPressed: Navigator.of(context).pop,
+                    child: Text(
+                      "Cancel",
+                      style: TextStyle(color: Colors.red),
+                    )),
+              )
+            ],
+          ));
+    });
+  }
+
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
