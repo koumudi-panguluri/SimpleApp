@@ -174,42 +174,6 @@ class _MyHomeAppState extends State<MyHomeApp> {
     }).toList();
   }
 
-  @override
-  void initState() {
-    super.initState();
-    print("Hello, Welcome to Koumi's App");
-    //firebase messaging
-    final fbm = FirebaseMessaging();
-    fbm.requestNotificationPermissions();
-    fbm.configure(onMessage: (message) {
-      print("on message $message");
-      return;
-    }, onLaunch: (message) {
-      print("on launch $message");
-      return;
-    }, onResume: (message) {
-      print("on resume $message");
-      return;
-    });
-    getData().catchError((error) {
-      showDialog(
-          context: context,
-          child: new AlertDialog(
-            title: Text("Something went Wrong"),
-            actions: <Widget>[
-              Container(
-                child: FlatButton(
-                    onPressed: Navigator.of(context).pop,
-                    child: Text(
-                      "Cancel",
-                      style: TextStyle(color: Colors.red),
-                    )),
-              )
-            ],
-          ));
-    });
-  }
-
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
